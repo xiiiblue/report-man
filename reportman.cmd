@@ -1,0 +1,1 @@
+java -jar report-man-1.0.jar

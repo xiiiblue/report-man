@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+    <Target>System.out</Target>
+    <encoder>
+      <pattern>%m%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>logs/report-man.log</File>
+    <append>true</append>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <maxIndex>10</maxIndex>
+      <FileNamePattern>logs/report-man.log.%i</FileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>100MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
+  <logger name="com.bluexiii.reportman" additivity="false" level="info">
+    <appender-ref ref="file"/>
+    <appender-ref ref="stdout"/>
+  </logger>
+
+  <root level="info">
+    <appender-ref ref="file"/>
+    <appender-ref ref="stdout"/>
+  </root>
+</configuration>

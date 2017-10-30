@@ -1,0 +1,7 @@
+custom.file.prefix: demo
+
+logging:
+  file: logs/report-man.log
+  level:
+    root: ERROR
+    com.bluexiii.reportman: INFO

@@ -1,0 +1,5 @@
+#spring.profiles.active: enable-swagger
+
+server.port: 19090
+
+custom.file.prefix: demo

@@ -1,0 +1,56 @@
+buildscript {
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+        maven { url "http://134.32.32.219:8081/nexus/content/groups/public" }
+        // mavenLocal() // mavenCentral()  //jcenter()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.4.RELEASE")
+    }
+}
+
+
+apply plugin: 'java'
+apply plugin: "spring-boot"
+
+jar {
+    baseName = 'report-man'
+    version = '1.0'
+}
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-jdbc'
+    compile 'org.springframework.boot:spring-boot-starter-mail'
+    compile 'org.apache.poi:poi-ooxml:3.17'
+    compile 'com.intellij:forms_rt:7.0.3'
+    compile 'com.google.guava:guava:20.0'
+    compile 'io.springfox:springfox-swagger2:2.7.0'
+    compile 'io.springfox:springfox-swagger-ui:2.7.0'
+
+    runtime 'mysql:mysql-connector-java:5.1.42'
+    runtime files('libs/ojdbc7-12.1.0.1.jar')
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+    exclude 'com/bluexiii/**'
+}
+
+
+task listJars(description: 'Display all compile jars.') << {
+    configurations.compile.each { File file -> println file.name }
+}
