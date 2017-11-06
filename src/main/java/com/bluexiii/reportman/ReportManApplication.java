@@ -6,6 +6,7 @@ import com.bluexiii.reportman.service.ReportManService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -31,6 +32,8 @@ public class ReportManApplication implements ApplicationRunner {
     private ReportManService reportManService;
     @Autowired
     private ApplicationContext context;
+    @Value("${custom.file.prefix}")
+    private String filePrefix;
 
     public static void main(String[] args) {
         if (System.getProperty("web") == null) {
@@ -39,6 +42,7 @@ public class ReportManApplication implements ApplicationRunner {
             LOGGER.info("启用WEB界面");
             SpringApplication.run(ReportManApplication.class, args);
         }
+
     }
 
     @Override
@@ -55,8 +59,7 @@ public class ReportManApplication implements ApplicationRunner {
                 System.setErr(new PrintStream(out));
             } else {
                 LOGGER.info("启动文本界面");
-                reportManService.init();
-                reportManService.makeReport();
+                reportManService.makeReport(filePrefix, null, true);
             }
         }
     }

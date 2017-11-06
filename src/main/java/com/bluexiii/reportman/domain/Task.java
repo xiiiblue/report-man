@@ -1,9 +1,9 @@
-package com.bluexiii.reportman.model;
+package com.bluexiii.reportman.domain;
 
 /**
  * Created by bluexiii on 17/10/2017.
  */
-public class TaskModel {
+public class Task {
     private String taskName;
     private String taskStatus;
     private String connTag;
@@ -79,7 +79,7 @@ public class TaskModel {
 
     @Override
     public String toString() {
-        return "TaskModel{" +
+        return "Task{" +
                 "taskName='" + taskName + '\'' +
                 ", taskStatus='" + taskStatus + '\'' +
                 ", connTag='" + connTag + '\'' +

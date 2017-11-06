@@ -1,13 +1,11 @@
 package com.bluexiii.reportman.component;
 
-import com.bluexiii.reportman.property.DynamicProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -16,12 +14,14 @@ import java.util.Map;
 /**
  * Created by bluexiii on 17/10/2017.
  */
-@Component
 public class JdbcComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcComponent.class);
-    @Autowired
-    private DynamicProperty dynamicProperty;
     private Map<String, JdbcTemplate> jdbcTemplateMap = new HashMap<>();
+    private Map<String, String> sysParamMap;
+
+    public JdbcComponent(Map<String, String> sysParamMap) {
+        this.sysParamMap = sysParamMap;
+    }
 
     /**
      * 获取数据源
@@ -49,12 +49,11 @@ public class JdbcComponent {
      */
     public JdbcTemplate getJdbcTemplate(String connTag) {
         LOGGER.debug("获取JdbcTemplate: {}", connTag);
-        Map<String, String> configMap = dynamicProperty.getConfigMap();
         if (!jdbcTemplateMap.containsKey(connTag)) {
-            String dbDriver = configMap.get("db." + connTag + ".driver");
-            String dbUrl = configMap.get("db." + connTag + ".url");
-            String dbUsername = configMap.get("db." + connTag + ".username");
-            String dbPassword = configMap.get("db." + connTag + ".password");
+            String dbDriver = sysParamMap.get("db." + connTag + ".driver");
+            String dbUrl = sysParamMap.get("db." + connTag + ".url");
+            String dbUsername = sysParamMap.get("db." + connTag + ".username");
+            String dbPassword = sysParamMap.get("db." + connTag + ".password");
             DataSource source = getDataSource(dbDriver, dbUrl, dbUsername, dbPassword);
             JdbcTemplate jdbcTemplate = new JdbcTemplate(source);
             jdbcTemplateMap.put(connTag, jdbcTemplate);
@@ -79,6 +78,7 @@ public class JdbcComponent {
      * @param connTag
      * @param sql
      */
+    @Transactional
     public void execute(String connTag, String sql) {
         getJdbcTemplate(connTag).execute(sql);
     }

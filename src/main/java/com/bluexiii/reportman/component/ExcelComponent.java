@@ -1,45 +1,34 @@
 package com.bluexiii.reportman.component;
 
-import com.bluexiii.reportman.property.StaticProperty;
+import com.bluexiii.reportman.domain.Task;
+import com.bluexiii.reportman.util.CommonUtils;
 import com.google.common.io.Files;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by bluexiii on 17/10/2017.
  */
-@Component
 public class ExcelComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelComponent.class);
-    @Autowired
-    private StaticProperty staticProperty;
+    private Map<String, XSSFCellStyle> styleMap = new HashMap<>();
     private XSSFWorkbook workbook;
-    private Map<String, XSSFCellStyle> styleMap;
+    private String reportPath;
 
-    /**
-     * 从模版初始化Excel
-     *
-     * @throws IOException
-     */
-    public void init() throws IOException {
-        String templatePath = staticProperty.getTemplatePath();
-        LOGGER.info("模版路径: {}", templatePath);
-        FileInputStream fileInputStream = new FileInputStream(templatePath);
-        styleMap = new HashMap<>();
-        workbook = new XSSFWorkbook(fileInputStream);
+    public ExcelComponent(String templatePath, String reportPath) throws IOException {
+        this.reportPath = reportPath;
+        // 打开模板
+        this.workbook = new XSSFWorkbook(new FileInputStream(templatePath));
     }
 
     /**
@@ -55,10 +44,6 @@ public class ExcelComponent {
      * @throws IOException
      */
     public void save() throws IOException {
-        String reportPath = staticProperty.getReportPath();
-
-
-        LOGGER.info("报表路径: {}", reportPath);
         Files.createParentDirs(new File(reportPath));
         FileOutputStream fileOutputSteam = new FileOutputStream(reportPath);
 
@@ -135,4 +120,75 @@ public class ExcelComponent {
         }
         return styleMap.get(styleTag);
     }
+
+    /**
+     * 读取参数
+     *
+     * @return
+     */
+    public Map<String, String> getSysParamMap(Map<String, String> customMap) {
+        Map<String, String> sysParamMap = new LinkedHashMap<>();
+
+        // 从Sheet2读取配置
+        XSSFSheet configSheet = readSheet(2);
+        int configCount = configSheet.getLastRowNum();
+        for (int configId = 1; configId <= configCount; configId++) {
+            XSSFRow configRow = configSheet.getRow(configId);
+            String configKey = configRow.getCell(1).toString();
+            String configValue = configRow.getCell(2).toString();
+            sysParamMap.put(configKey, configValue);
+        }
+
+        // 并入自定义配置
+        if (customMap != null) {
+            for (String key : customMap.keySet()) {
+                sysParamMap.put(key, customMap.get(key));
+            }
+        }
+
+        return sysParamMap;
+    }
+
+    /**
+     * 读取任务
+     *
+     * @return
+     */
+    public List<Task> getTaskList(Map<String, String> sysParamMap) {
+        // 取出SQL配置
+        Map<String, String> sqlParamMap = new LinkedHashMap<>();
+        for (String key : sysParamMap.keySet()) {
+            if (key.startsWith("sql.")) {
+                sqlParamMap.put(key.replaceFirst("sql.", ""), sysParamMap.get(key));
+            }
+        }
+
+        // 从Sheet1读取任务
+        List<Task> taskList = new LinkedList<>();
+        XSSFSheet taskSheet = readSheet(1);
+        int taskCount = taskSheet.getLastRowNum();
+        for (int statId = 1; statId <= taskCount; statId++) {
+            XSSFRow taskRow = taskSheet.getRow(statId);
+            Task task = new Task();
+            task.setTaskName(taskRow.getCell(0).getStringCellValue());
+            task.setTaskStatus(taskRow.getCell(1).getStringCellValue());
+            task.setConnTag(taskRow.getCell(2).getStringCellValue());
+            String sql = taskRow.getCell(3).getStringCellValue();
+            // SQL语句中拼入参数
+            if (sqlParamMap.size() > 0) {
+                sql = CommonUtils.replaceAllaram(sql, sqlParamMap);
+            }
+            task.setSql(sql);
+            task.setSheetId(Integer.parseInt(taskRow.getCell(4).getRawValue()));
+            task.setOffsetX(Integer.parseInt(taskRow.getCell(5).getRawValue()));
+            task.setOffsetY(Integer.parseInt(taskRow.getCell(6).getRawValue()));
+            task.setCellStyle(taskRow.getCell(7).getStringCellValue());
+            if (task.getTaskStatus().equals("Y")) {
+                taskList.add(task);
+            }
+        }
+        LOGGER.debug("taskList: {}", taskList);
+        return taskList;
+    }
+
 }

@@ -281,3 +281,21 @@ SQL参数|sql.end_date|2012-1-1
 - 在本机执行`gradle build`构建项目，将生成的`build/libs/report-man-1.0.jar`上传至服务器。
 - 在jar包所在路径下新建template及report两个目录。其中template中存放模板，report目录用于存放生成的报表。
 - 可以使用`crontab -e`配置定时执行
+
+## 附录
+### crontab
+```
+25 23 * * * cd /mobsale/report-man && java -jar report-man-1.0.jar --custom.file.prefix=掌沃营销.工号使用
+
+30 23 * * * cd /mobsale/report-man && java -jar report-man-1.0.jar --custom.file.prefix=掌沃营销.日报.集客
+32 23 * * * cd /mobsale/report-man && java -jar report-man-1.0.jar --custom.file.prefix=掌沃营销.日报.公客
+34 23 * * * cd /mobsale/report-man && java -jar report-man-1.0.jar --custom.file.prefix=掌沃营销.日报.全量
+
+36 23 * * 3 cd /mobsale/report-man && java -jar report-man-1.0.jar --custom.file.prefix=掌沃营销.周报.集客
+38 23 * * 3 cd /mobsale/report-man && java -jar report-man-1.0.jar --custom.file.prefix=掌沃营销.周报.公客
+40 23 * * 3 cd /mobsale/report-man && java -jar report-man-1.0.jar --custom.file.prefix=掌沃营销.周报.全量
+
+20 23 * * * cd /mobsale/report-man && java -jar report-man-1.0.jar --custom.file.prefix=掌沃营销.临沂.日报
+22 23 * * * cd /mobsale/report-man && java -jar report-man-1.0.jar --custom.file.prefix=掌沃营销.临沂.月报
+24 23 * * * cd /mobsale/report-man && java -jar report-man-1.0.jar --custom.file.prefix=掌沃营销.临沂.全量
+```

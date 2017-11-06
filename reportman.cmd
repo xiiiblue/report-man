@@ -1,1 +1,1 @@
-java -jar report-man-1.0.jar
+start javaw -jar report-man-1.0.jar
