@@ -1,7 +1,6 @@
-package com.bluexiii.reportman.component;
+package com.bluexiii.reportman.util;
 
-import com.bluexiii.reportman.domain.Task;
-import com.bluexiii.reportman.util.CommonUtils;
+import com.bluexiii.reportman.model.Task;
 import com.google.common.io.Files;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -19,13 +18,13 @@ import java.util.*;
 /**
  * Created by bluexiii on 17/10/2017.
  */
-public class ExcelComponent {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelComponent.class);
+public class ExcelUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtils.class);
     private Map<String, XSSFCellStyle> styleMap = new HashMap<>();
     private XSSFWorkbook workbook;
     private String reportPath;
 
-    public ExcelComponent(String templatePath, String reportPath) throws IOException {
+    public ExcelUtils(String templatePath, String reportPath) throws IOException {
         this.reportPath = reportPath;
         // 打开模板
         this.workbook = new XSSFWorkbook(new FileInputStream(templatePath));
@@ -176,7 +175,7 @@ public class ExcelComponent {
             String sql = taskRow.getCell(3).getStringCellValue();
             // SQL语句中拼入参数
             if (sqlParamMap.size() > 0) {
-                sql = CommonUtils.replaceAllaram(sql, sqlParamMap);
+                sql = StringUtils.replaceAllaram(sql, sqlParamMap);
             }
             task.setSql(sql);
             task.setSheetId(Integer.parseInt(taskRow.getCell(4).getRawValue()));

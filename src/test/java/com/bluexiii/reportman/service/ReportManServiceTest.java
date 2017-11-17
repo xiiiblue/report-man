@@ -25,6 +25,6 @@ public class ReportManServiceTest {
 
     @Test
     public void makeReport() throws Exception {
-        reportManService.makeReport("demo", null, false);
+        reportManService.makeReport("demo", null, null, false);
     }
 }

@@ -1,4 +1,4 @@
-package com.bluexiii.reportman.component;
+package com.bluexiii.reportman.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +14,12 @@ import java.util.Map;
 /**
  * Created by bluexiii on 17/10/2017.
  */
-public class JdbcComponent {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcComponent.class);
+public class JdbcUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcUtils.class);
     private Map<String, JdbcTemplate> jdbcTemplateMap = new HashMap<>();
     private Map<String, String> sysParamMap;
 
-    public JdbcComponent(Map<String, String> sysParamMap) {
+    public JdbcUtils(Map<String, String> sysParamMap) {
         this.sysParamMap = sysParamMap;
     }
 

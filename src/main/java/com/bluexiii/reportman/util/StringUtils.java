@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by bluexiii on 24/10/2017.
  */
-public class CommonUtils {
+public class StringUtils {
     /**
      * SQL模板替换
      *

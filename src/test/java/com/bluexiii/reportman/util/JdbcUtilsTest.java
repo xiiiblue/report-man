@@ -1,5 +1,6 @@
-package com.bluexiii.reportman.component;
+package com.bluexiii.reportman.util;
 
+import com.bluexiii.reportman.util.JdbcUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +15,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class JdbcComponentTest {
+public class JdbcUtilsTest {
     @Autowired
-    private JdbcComponent jdbcComponent;
+    private JdbcUtils jdbcUtils;
 
     @Test
     public void queryForRowSet() throws Exception {
-        SqlRowSet sqlRowSet = jdbcComponent.queryForRowSet("mobsale", "SELECT 123");
+        SqlRowSet sqlRowSet = jdbcUtils.queryForRowSet("mobsale", "SELECT 123");
         assertThat(sqlRowSet).isNotNull();
     }
 }

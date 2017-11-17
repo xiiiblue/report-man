@@ -1,4 +1,4 @@
-package com.bluexiii.reportman.domain;
+package com.bluexiii.reportman.model;
 
 /**
  * Created by bluexiii on 17/10/2017.

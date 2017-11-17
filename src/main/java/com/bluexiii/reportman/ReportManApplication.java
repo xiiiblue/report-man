@@ -59,7 +59,7 @@ public class ReportManApplication implements ApplicationRunner {
                 System.setErr(new PrintStream(out));
             } else {
                 LOGGER.info("启动文本界面");
-                reportManService.makeReport(filePrefix, null, true);
+                reportManService.makeReport(filePrefix,null, null, true);
             }
         }
     }

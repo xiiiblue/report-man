@@ -1,4 +1,4 @@
-package com.bluexiii.reportman.component;
+package com.bluexiii.reportman.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +17,12 @@ import java.util.Properties;
 /**
  * Created by bluexiii on 17/10/2017.
  */
-public class MailComponent {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MailComponent.class);
+public class MailUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailUtils.class);
     private JavaMailSenderImpl mailSender;
     private Map<String, String> sysParamMap;
 
-    public MailComponent(Map<String, String> sysParamMap) {
+    public MailUtils(Map<String, String> sysParamMap) {
         this.sysParamMap = sysParamMap;
     }
 

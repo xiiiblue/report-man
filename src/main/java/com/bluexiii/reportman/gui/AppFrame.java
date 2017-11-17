@@ -1,7 +1,10 @@
 package com.bluexiii.reportman.gui;
 
 import com.bluexiii.reportman.ReportManApplication;
+import com.bluexiii.reportman.model.Progress;
+import com.bluexiii.reportman.service.ProgressService;
 import com.bluexiii.reportman.service.ReportManService;
+import com.bluexiii.reportman.util.StringUtils;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.slf4j.Logger;
@@ -30,12 +33,15 @@ public class AppFrame extends JFrame {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportManApplication.class);
     @Autowired
     private ReportManService reportManService;
+    @Autowired
+    private ProgressService progressService;
 
     private JPanel mainPanel;
     private JButton submitBtn;
     private JScrollPane LogScrollPane;
     private JTextArea logTextArea;
     private JComboBox filePrefixList;
+    private JProgressBar reportProgress;
 
     public JTextArea getLogTextArea() {
         return logTextArea;
@@ -67,6 +73,8 @@ public class AppFrame extends JFrame {
             }
         };
         worker.execute();
+
+
     }
 
     public AppFrame() throws HeadlessException, FileNotFoundException, UnsupportedEncodingException {
@@ -80,6 +88,17 @@ public class AppFrame extends JFrame {
         logTextArea.setEditable(false);
         logTextArea.setLineWrap(true);
 
+        // 进度条
+        reportProgress.setMinimum(0);
+        reportProgress.setMaximum(100);
+
+        // 使用系统主题
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         // 开始按钮点击事件
         submitBtn.addActionListener(new ActionListener() {
             @Override
@@ -90,16 +109,36 @@ public class AppFrame extends JFrame {
                 // 重置日志显示
                 logTextArea.setText("");
 
-                SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
+                SwingWorker<String, Void> swingWorker = new SwingWorker<String, Void>() {
                     public String doInBackground() throws IOException {
                         // 生成报表
-                        String filePrefix = (String) filePrefixList.getSelectedItem();
+                        final String filePrefix = (String) filePrefixList.getSelectedItem();
+                        final String fileSuffix = StringUtils.getFileSuffix();
 
+                        // 进度条
+                        SwingWorker<String, Void> swingWorker = new SwingWorker<String, Void>() {
+                            public String doInBackground() throws IOException, InterruptedException {
+                                reportProgress.setValue(0);
+                                for (int i = 0; i <= 600; i++) {
+                                    Progress progress = progressService.getProgress(fileSuffix);
+                                    int percent = progress.getPercent();
+                                    reportProgress.setValue(percent);
+                                    if (percent >= 100) {
+                                        return "";
+                                    }
+                                    Thread.sleep(1000);
+                                }
+                                return "";
+                            }
+                        };
+                        swingWorker.execute();
+
+                        // 执行报表服务
                         try {
-                            reportManService.makeReport(filePrefix, null, false);
+
+                            reportManService.makeReport(filePrefix, fileSuffix, null, false);
                         } catch (RuntimeException e) {
                             e.printStackTrace();
-
                             submitBtn.setEnabled(true);
                             JOptionPane.showMessageDialog(null, "报表生成失败，请根据日志检查模板配置！", "失败", JOptionPane.INFORMATION_MESSAGE);
                             return "";
@@ -111,9 +150,10 @@ public class AppFrame extends JFrame {
                         return "";
                     }
                 };
-                worker.execute();
+                swingWorker.execute();
             }
         });
+
 
     }
 
@@ -137,7 +177,7 @@ public class AppFrame extends JFrame {
      */
     private void $$$setupUI$$$() {
         mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayoutManager(2, 2, new Insets(15, 15, 15, 15), -1, -1));
+        mainPanel.setLayout(new GridLayoutManager(3, 2, new Insets(15, 15, 10, 15), -1, -1));
         LogScrollPane = new JScrollPane();
         mainPanel.add(LogScrollPane, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         logTextArea = new JTextArea();
@@ -147,6 +187,8 @@ public class AppFrame extends JFrame {
         mainPanel.add(submitBtn, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_SOUTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         filePrefixList = new JComboBox();
         mainPanel.add(filePrefixList, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(236, 26), null, 0, false));
+        reportProgress = new JProgressBar();
+        mainPanel.add(reportProgress, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

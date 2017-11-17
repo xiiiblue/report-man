@@ -1,5 +1,6 @@
-package com.bluexiii.reportman.component;
+package com.bluexiii.reportman.util;
 
+import com.bluexiii.reportman.util.ExcelUtils;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,19 +15,19 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class ExcelComponentTest {
+public class ExcelUtilsTest {
     @Autowired
-    private ExcelComponent excelComponent;
+    private ExcelUtils excelUtils;
 
     @Test
     public void readSheet() throws Exception {
-        XSSFSheet sheet = excelComponent.readSheet(1);
+        XSSFSheet sheet = excelUtils.readSheet(1);
         int lastRowNum = sheet.getLastRowNum();
         assertThat(lastRowNum).isGreaterThan(0);
     }
 
     @Test
     public void removeSheet() throws Exception {
-        excelComponent.removeSheet(1);
+        excelUtils.removeSheet(1);
     }
 }
